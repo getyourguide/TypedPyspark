@@ -1,8 +1,9 @@
-from typing import _TypingEmpty, _tp_cache, Generic, get_type_hints
-from pyspark.sql import DataFrame
+from typing import List, Generic, get_type_hints
+from pyspark.sql import DataFrame as DataFrameOrig
 import inspect
+import attr
 
-def _get_columns_dtypes(p):
+def _get_column_types(p):
     columns = set()
     dtypes = {}
 
@@ -15,7 +16,7 @@ def _get_columns_dtypes(p):
         dtypes[p.start] = p.stop
     elif isinstance(p, (list, set)):
         for el in p:
-            subcolumns, subdtypes = _get_columns_dtypes(el)
+            subcolumns, subdtypes = _get_column_types(el)
             columns |= subcolumns
             dtypes.update(subdtypes)
     elif isinstance(p, DatasetMeta):
@@ -30,12 +31,11 @@ class DatasetMeta(type):
     def __new__(metacls, name, bases, namespace, **kargs):
         return super().__new__(metacls, name, bases, namespace)
 
-    @_tp_cache
     def __getitem__(self, parameters):
         if hasattr(self, '__origin__') and (self.__origin__ is not None or self._gorg is not Dataset):
             return super().__getitem__(parameters)
         if parameters == ():
-            return super().__getitem__((_TypingEmpty,))
+            return super().__getitem__(())
         if not isinstance(parameters, tuple):
             parameters = (parameters,)
         parameters = list(parameters)
@@ -45,7 +45,7 @@ class DatasetMeta(type):
             only_specified = False
             parameters.pop()
 
-        columns, dtypes = _get_columns_dtypes(parameters)
+        columns, dtypes = _get_column_types(parameters)
 
         meta = DatasetMeta(self.__name__, self.__bases__, {})
         meta.only_specified = only_specified
@@ -54,11 +54,39 @@ class DatasetMeta(type):
 
         return meta
 
-class DataFrame(DataFrame, extra=Generic, metaclass=DatasetMeta):
+class DataFrame(DataFrameOrig, extra=Generic, metaclass=DatasetMeta):
     """Defines type Dataset to serve as column name & type enforcement for pandas DataFrames"""
 
     def __new__(cls, *args, **kwds):
-        if not hasattr(cls, '_gorg') or cls._gorg is Dataset:
-            raise TypeError("Type Dataset cannot be instantiated; "
-                            "use pandas.DataFrame() instead")
-        return _generic_new(pd.DataFrame, cls, *args, **kwds)
+        if not hasattr(cls, '_gorg'):
+            raise TypeError("Cannot instantiate this object directly")
+        return _generic_new(DataFrameOrig, cls, *args, **kwds)
+
+
+class DataFrameClass(DataFrameOrig):
+    def __init__(self, *args, **kwargs):
+        for name, value in kwargs.items():
+            print(name, value)
+            setattr(self, name, value)
+
+    @classmethod
+    def from_data(cls, data: List[dict]) -> List['DataFrameClass']:
+        result = []
+        for row in data:
+            rowobj = cls(**row)
+            result.append(rowobj)
+
+        return result
+
+    def __getattr__(self, name):
+           return self[name]
+
+    def __getitem__(self, items):
+        return None
+
+    def __repr__(self):
+        return object.__repr__(self)
+
+
+
+
