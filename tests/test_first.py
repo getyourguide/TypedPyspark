@@ -6,13 +6,13 @@ from typing import Any, NewType
 import pyspark.sql.functions as F
 from pyspark.sql.session import SparkSession
 
-from typed_pyspark import DataFrameNew, class_annotation
+from typed_pyspark import DataFrame, class_annotation
 
 spark = SparkSession.builder.getOrCreate()
 
 
 @class_annotation
-class User(DataFrameNew):
+class User(DataFrame):
     name: str
     age: str
 
@@ -27,7 +27,7 @@ users = User.from_data(users_data)
 
 name = NewType("name", str)
 age = NewType("age", int)
-SumResult = DataFrameNew["name", "age"]
+SumResult = DataFrame["name", "age"]
 
 
 def avg_age(df: User) -> SumResult:
@@ -35,7 +35,7 @@ def avg_age(df: User) -> SumResult:
 
 
 def test_columns_present():
-    annotation = DataFrameNew["name":str, "age":int]
+    annotation = DataFrame["name":str, "age":int]
     assert annotation.columns == {"name", "age"}
 
 
@@ -43,7 +43,7 @@ def test_create_objects():
     user = User(**users_data[0])
 
     assert user.name == users_data[0]["name"]
-    assert isinstance(user, DataFrameNew)
+    assert isinstance(user, DataFrame)
 
     assert users[0].name == users_data[0]["name"]
     assert users[0].age == users_data[0]["age"]

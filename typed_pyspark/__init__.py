@@ -74,13 +74,13 @@ def class_annotation(cls):
 T = TypeVar("T", contravariant=True)
 
 
-class DataFrameNew(DataFrameOrig, extra=Generic[T], metaclass=DataFrameMeta):
+class DataFrame(DataFrameOrig, extra=Generic[T], metaclass=DataFrameMeta):
     def __init__(self, *args, **kwargs):
         for name, value in kwargs.items():
             setattr(self, name, value)
 
     @classmethod
-    def from_data(cls, data: List[dict]) -> List["DataFrameNew"]:
+    def from_data(cls, data: List[dict]) -> List["DataFrame"]:
         result = []
         for row in data:
             rowobj = cls(**row)
