@@ -1,4 +1,5 @@
 from typing import List, Generic, get_type_hints
+import typing
 from pyspark.sql import DataFrame as DataFrameOrig
 import inspect
 import attr
@@ -54,23 +55,21 @@ class DatasetMeta(type):
 
         return meta
 
+
+
+def class_annotation(cls):
+    print("class annotation happening")
+    return cls
+
 class DataFrame(DataFrameOrig, extra=Generic, metaclass=DatasetMeta):
-    """Defines type Dataset to serve as column name & type enforcement for pandas DataFrames"""
 
-    def __new__(cls, *args, **kwds):
-        if not hasattr(cls, '_gorg'):
-            raise TypeError("Cannot instantiate this object directly")
-        return _generic_new(DataFrameOrig, cls, *args, **kwds)
-
-
-class DataFrameClass(DataFrameOrig):
     def __init__(self, *args, **kwargs):
         for name, value in kwargs.items():
             print(name, value)
             setattr(self, name, value)
 
     @classmethod
-    def from_data(cls, data: List[dict]) -> List['DataFrameClass']:
+    def from_data(cls, data: List[dict]) -> List['DataFrame']:
         result = []
         for row in data:
             rowobj = cls(**row)
@@ -86,7 +85,3 @@ class DataFrameClass(DataFrameOrig):
 
     def __repr__(self):
         return object.__repr__(self)
-
-
-
-

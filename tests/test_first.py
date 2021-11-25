@@ -1,13 +1,15 @@
 from pyspark.sql.session import SparkSession
-from typed_pyspark import DataFrame, DataFrameClass
-from dataclasses import dataclass
+from typed_pyspark import DataFrame, class_annotation
 import pyspark.sql.functions as F
 
 spark = SparkSession.builder.getOrCreate()
 
-class User(DataFrameClass):
+@class_annotation
+class User(DataFrame):
     name: str
     age: str
+
+Foo = class_annotation(DataFrame['abc'])
 
 users_data = [
     {'name': 'user1', 'age': 29},
@@ -16,8 +18,7 @@ users_data = [
 ]
 
 users = User.from_data(users_data)
-SumResult = DataFrame['name', 'age']
-breakpoint()
+SumResult = DataFrame['name': type(str), 'age']
 
 def avg_age(df: User) -> SumResult:
     return df.groupBy('name').agg(F.sum('age').alias('sum'))
@@ -40,4 +41,3 @@ def test_function_defition():
     df = spark.createDataFrame(users)
 
     result = avg_age(df)
-
