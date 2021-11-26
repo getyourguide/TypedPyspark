@@ -5,6 +5,10 @@ from typing import List, TypeVar, Union
 from pyspark.sql import DataFrame as DataFrameOrig
 
 
+def wrap_with_generic(x):
+    return TypeVar("DataFrame", x, DataFrameOrig)
+
+
 class DataFrame(DataFrameOrig):
     """
     TypedDataFrame abstraction

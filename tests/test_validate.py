@@ -1,12 +1,16 @@
-from typing import Any, Union
+from typing import Any, TypeVar
 
 import pyspark.sql.functions as F
 import pytest
 from pyspark.sql import DataFrame as DataFrameOrig
 from pyspark.sql import SparkSession
 
-from typed_pyspark import (DataFrame, InvalidSchemaException,
-                           validate_dataframes)
+from typed_pyspark import (
+    DataFrame,
+    InvalidSchemaException,
+    validate_dataframes,
+    wrap_with_generic,
+)
 
 
 def test_wrong_argument_type():
@@ -26,7 +30,6 @@ def test_wrong_argument_type():
 
 def test_arguments_number():
     id = Any
-    name = Any
 
     spark = SparkSession.builder.getOrCreate()
     df = spark.createDataFrame([{"id": "123"}])
@@ -46,7 +49,8 @@ def test_return():
 
     spark = SparkSession.builder.getOrCreate()
     df = spark.createDataFrame([{"id": "123"}])
-    ReturnType = Union[DataFrame["id", "name"], DataFrameOrig]
+
+    ReturnType = wrap_with_generic(DataFrame["id", "name"])
 
     @validate_dataframes
     def get_name_wrong(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
