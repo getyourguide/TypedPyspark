@@ -45,7 +45,7 @@ def test_return():
 
     spark = SparkSession.builder.getOrCreate()
     df = spark.createDataFrame([{"id": "123"}])
-    ReturnType = Union[DataFrame["id", "name"], DataFrameOrig]
+    ReturnType = DataFrame["id", "name"]
 
     @validate_dataframes
     def get_name_wrong(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
