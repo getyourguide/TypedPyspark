@@ -1,3 +1,4 @@
 __pychache__*
 *egg-info
 .mypy_cache
+dist/*
