@@ -10,7 +10,7 @@ Allows one to:
 
 #  Rationale
 
-Projects using spark that follow software engineering best practices is common to see
+In Projects using spark that follow software engineering best practices is common to see
 functions defined with type annotations like this:
 
 ```py
@@ -21,7 +21,7 @@ def get_name_from_id(dt: DataFrame) -> DataFrame:
 ```
 
 But this type annotation only guarantees that a DataFrame instance is called.
-It says nothing about important information about the dataframe.
+It says nothing about how the dataframe looks like.
 
 1. If the columns needed are there
 2. If they have the correct types
