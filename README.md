@@ -11,7 +11,9 @@ Allows one to:
 
 # Install
 
+```sh
 pip install typed_pyspark
+```
 
 
 #  Usage
@@ -19,6 +21,8 @@ pip install typed_pyspark
 The library allows you to write code like this:
 
 ```py
+from typed_pyspark import DataFrame, validate_dataframes
+
 @validate_dataframes
 def get_name_right(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
     return dt.withColumn("name", F.lit("abc"))
