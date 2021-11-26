@@ -12,7 +12,8 @@ class DataFrame:
     """
 
     def __class_getitem__(cls, *args, **kwargs):
-        df_class = type("DataFrame", (DataFrame,), {})
+        # 'inherits a new type from dataframe base type'
+        df_class = type("TypedDataFrame", (DataFrame,), {})
 
         df_class.schema = {}
         df_class.schema["args"] = args
@@ -33,12 +34,28 @@ class DataFrame:
         return result
 
 
-def validate(func):
-    """ validate dataframe objects """
+class InvalidSchemaException(Exception):
+    pass
+
+
+def validate_dataframes(func):
+    """ validate all dataframes available in a function"""
 
     def wrap(*args, **kwargs):
-        breakpoint()
         result = func(*args, **kwargs)
+
+        if (
+            "return" in func.__annotations__
+            and DataFrame in func.__annotations__["return"].__bases__
+        ):
+            columns_expected = set(func.__annotations__["return"].schema["args"][0])
+            columns_got = set(result.columns)
+
+            if columns_expected != columns_got:
+                raise InvalidSchemaException(
+                    f"Return Schema different, got: {columns_got}, expected: {columns_expected}"
+                )
+
         return result
 
     return wrap
