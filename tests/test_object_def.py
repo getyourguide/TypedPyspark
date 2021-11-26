@@ -22,4 +22,4 @@ def test_spark():
     def f_spark(f: User) -> User:
         return f
 
-    f_spark(df)
+    user: User = f_spark(df)
