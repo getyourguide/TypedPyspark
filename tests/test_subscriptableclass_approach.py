@@ -11,8 +11,6 @@ def test_with_spark():
     spark = SparkSession.builder.getOrCreate()
     df = spark.createDataFrame([{"phone": "1233125"}])
 
-    df.show()
-
     def test(df: df_names) -> DataFrame["phone", "url"]:
         return df
 
