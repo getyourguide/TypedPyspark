@@ -22,6 +22,7 @@ class DataFrame(DataFrameOrig):
         df_class.schema["args"] = args
         df_class.schema["kwargs"] = kwargs
 
+        #return wrap_with_generic(df_class)
         return df_class
 
     def __init__(self, *args, **kwargs):

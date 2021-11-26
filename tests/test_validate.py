@@ -5,12 +5,8 @@ import pytest
 from pyspark.sql import DataFrame as DataFrameOrig
 from pyspark.sql import SparkSession
 
-from typed_pyspark import (
-    DataFrame,
-    InvalidSchemaException,
-    validate_dataframes,
-    wrap_with_generic,
-)
+from typed_pyspark import (DataFrame, InvalidSchemaException,
+                           validate_dataframes, wrap_with_generic)
 
 
 def test_wrong_argument_type():
