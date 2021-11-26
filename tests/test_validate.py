@@ -5,7 +5,8 @@ import pytest
 from pyspark.sql import DataFrame as DataFrameOrig
 from pyspark.sql import SparkSession
 
-from typed_pyspark import DataFrame, InvalidSchemaException, validate_dataframes
+from typed_pyspark import (DataFrame, InvalidSchemaException,
+                           validate_dataframes)
 
 
 def test_wrong_argument_type():
@@ -45,7 +46,7 @@ def test_return():
 
     spark = SparkSession.builder.getOrCreate()
     df = spark.createDataFrame([{"id": "123"}])
-    ReturnType = DataFrame["id", "name"]
+    ReturnType = Union[DataFrame["id", "name"], DataFrameOrig]
 
     @validate_dataframes
     def get_name_wrong(dt: DataFrame["id"]) -> DataFrame["id", "name"]:

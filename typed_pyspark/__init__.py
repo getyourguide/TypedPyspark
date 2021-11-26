@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, TypeVar
+from typing import List, TypeVar, Union
 
 from pyspark.sql import DataFrame as DataFrameOrig
 
