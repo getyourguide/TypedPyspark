@@ -1,10 +1,14 @@
 import unittest
-from pyspark.sql.session import SparkSession
+
 import pyspark.sql.functions as F
+from pyspark.sql.session import SparkSession
+
 from typed_pyspark import DataFrame, class_annotation
+
 
 def avg_age(df):
     return df.groupBy("name").agg(F.sum("age").alias("sum"))
+
 
 @class_annotation
 class User(DataFrame):
@@ -43,5 +47,5 @@ class AnnotationTestCase(unittest.TestCase):
         assert self.users[1].age == users_data[1]["age"]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

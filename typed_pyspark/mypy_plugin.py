@@ -11,7 +11,6 @@ class CustomPlugin(Plugin):
         # return func.default_return_type
 
     def get_function_hook(self, name):
-        print("JEAN: " + name)
         if name == "DF":
             return self.main
         else:

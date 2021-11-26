@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Any, NewType
+
 from typed_pyspark import DataFrame, class_annotation
 
 
