@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-import typing
-from typing import Any, Generic, List, NewType, TypeVar, get_type_hints
+from typing import List, TypeVar
 
 from pyspark.sql import DataFrame as DataFrameOrig
 
 
-class DataFrame:
+class DataFrame(DataFrameOrig):
     """
     TypedDataFrame abstraction
     """
 
     def __class_getitem__(cls, *args, **kwargs):
         # 'inherits a new type from dataframe base type'
-        df_class = type("TypedDataFrame", (DataFrame,), {})
+        df_class = type("TypedDataFrame", (DataFrame, DataFrameOrig), {})
 
         df_class.schema = {}
         df_class.schema["args"] = args
@@ -47,7 +46,6 @@ def validate_dataframes(func):
         Validator.validate_result(func, result)
         return result
 
-
     return wrap
 
 
@@ -55,8 +53,11 @@ class Validator:
     @staticmethod
     def validate_args(func, args, kwargs):
 
-        expected_dataframe_arguments = [x for x in func.__annotations__ if x != 'return' and DataFrame  in
-                                        func.__annotations__[x].__bases__]
+        expected_dataframe_arguments = [
+            x
+            for x in func.__annotations__
+            if x != "return" and DataFrame in func.__annotations__[x].__bases__
+        ]
 
         if not len(expected_dataframe_arguments):
             return
@@ -64,30 +65,34 @@ class Validator:
         args_to_be_validated = [arg for arg in args if isinstance(arg, DataFrameOrig)]
 
         if len(expected_dataframe_arguments) != len(args_to_be_validated):
-            raise InvalidSchemaException(f"Expected : {len(expected_dataframe_arguments)} dataframes got only {len(args_to_be_validated)}")
-
+            raise InvalidSchemaException(
+                f"Expected : {len(expected_dataframe_arguments)} dataframes got only {len(args_to_be_validated)}"
+            )
 
         for i in range(0, len(args_to_be_validated)):
             columns_got = set(args_to_be_validated[i].columns)
-            columns_expected = set(func.__annotations__[expected_dataframe_arguments[i]].schema["args"])
+            columns_expected = set(
+                func.__annotations__[expected_dataframe_arguments[i]].schema["args"]
+            )
 
             if columns_expected != columns_got:
                 raise InvalidSchemaException(
                     f"Return Schema different, got: {columns_got}, expected: {columns_expected}"
                 )
-
-
 
     @staticmethod
     def validate_result(func, result):
         if (
-                "return" in func.__annotations__
-                and DataFrame in func.__annotations__["return"].__bases__
+            "return" not in func.__annotations__
+            or not hasattr(func.__annotations__["return"], "__bases__")
+            or DataFrame not in func.__annotations__["return"].__bases__
         ):
-            columns_expected = set(func.__annotations__["return"].schema["args"][0])
-            columns_got = set(result.columns)
+            return
 
-            if columns_expected != columns_got:
-                raise InvalidSchemaException(
-                    f"Return Schema different, got: {columns_got}, expected: {columns_expected}"
-                )
+        columns_expected = set(func.__annotations__["return"].schema["args"][0])
+        columns_got = set(result.columns)
+
+        if columns_expected != columns_got:
+            raise InvalidSchemaException(
+                f"Return Schema different, got: {columns_got}, expected: {columns_expected}"
+            )

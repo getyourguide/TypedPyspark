@@ -9,15 +9,22 @@ Allows one to:
 - Type check them
 
 
+# Install
 
-# Usage
+pip install typed_pyspark
 
+
+#  Usage
+
+The library allows you to write code like this:
+
+```py
+@validate_dataframes
+def get_name_right(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
+    return dt.withColumn("name", F.lit("abc"))
 ```
 
-# create type annotaitons on the fly and apply it to functions
-
-DataFrame["phone", "url"]
-```
+And get type errors when the annotations dont match reality.
 
 
 ## Acknowledgements
