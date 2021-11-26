@@ -16,8 +16,8 @@ functions defined with type annotations this:
 ```py
 from pyspark.sql import DataFrame
 
-def get_name_right(dt: DataFrame) -> DataFrame:
-    return dt.withColumn("name", F.lit("abc"))
+def get_name_from_id(dt: DataFrame) -> DataFrame:
+    ...
 ```
 
 But this type annotation only guarantees that a DataFrame instance is called, it says nothing about the content of the dataframe.
@@ -32,8 +32,8 @@ This library tries to address exactly these problems, with it you can do somethi
 from typed_pyspark import DataFrame, validate_dataframes
 
 @validate_dataframes
-def get_name_right(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
-    return dt.withColumn("name", F.lit("abc"))
+def get_name_from_id(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
+    ...
 ```
 
 And get type errors when the annotations dont match reality.
