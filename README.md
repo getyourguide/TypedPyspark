@@ -4,9 +4,9 @@ Contains a set of abstractions to type dataframes in pyspark.
 
 Allows one to:
 
-
-- Define dataframe type annotation for functions and return types
-- Type check them
+- Define dataframe schemas and use them as annotations in variables, functions, classes
+- Validate them in realtime with the @validate_dataframes functionality
+- Type check them statically (mypy support)
 
 
 # Install
@@ -14,7 +14,6 @@ Allows one to:
 ```sh
 pip install typed_pyspark
 ```
-
 
 #  Usage
 
