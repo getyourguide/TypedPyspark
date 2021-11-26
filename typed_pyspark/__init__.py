@@ -7,8 +7,18 @@ from pyspark.sql import DataFrame as DataFrameOrig
 
 
 class DataFrame:
+    """
+    TypedDataFrame abstraction
+    """
+
     def __class_getitem__(cls, *args, **kwargs):
-        return DataFrame
+        df_class = type("DataFrame", (DataFrame,), {})
+
+        df_class.schema = {}
+        df_class.schema["args"] = args
+        df_class.schema["kwargs"] = kwargs
+
+        return df_class
 
     def __init__(self, *args, **kwargs):
         pass
@@ -24,9 +34,10 @@ class DataFrame:
 
 
 def validate(func):
-    print(func.__annotations__)
+    """ validate dataframe objects """
 
     def wrap(*args, **kwargs):
+        breakpoint()
         result = func(*args, **kwargs)
         return result
 
