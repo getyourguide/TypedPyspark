@@ -1,9 +1,42 @@
 from typing import Any
 
+import pyspark.sql.functions as F
 import pytest
 from pyspark.sql import SparkSession
 
-from typed_pyspark import DataFrame, InvalidSchemaException, validate_dataframes
+from typed_pyspark import (DataFrame, InvalidSchemaException,
+                           validate_dataframes)
+
+
+def test_wrong_argument_type():
+    id = Any
+    name = Any
+
+    spark = SparkSession.builder.getOrCreate()
+    df = spark.createDataFrame([{"wrong_col": "123"}])
+
+    @validate_dataframes
+    def wrong_col(dt1: DataFrame["id"]):
+        return dt1
+
+    with pytest.raises(InvalidSchemaException):
+        wrong_col(df)
+
+
+def test_arguments_number():
+    id = Any
+    name = Any
+
+    spark = SparkSession.builder.getOrCreate()
+    df = spark.createDataFrame([{"id": "123"}])
+
+    @validate_dataframes
+    def wrong_num_of_params(dt1: DataFrame["id"], dt2: DataFrame["id"]):
+        return dt1
+
+    with pytest.raises(InvalidSchemaException):
+        # pass a dataframe and a non-dataframe where 2 dataframes are expected
+        wrong_num_of_params(df)
 
 
 def test_return():
@@ -14,8 +47,14 @@ def test_return():
     df = spark.createDataFrame([{"id": "123"}])
 
     @validate_dataframes
-    def get_name(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
+    def get_name_wrong(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
         return dt
 
     with pytest.raises(InvalidSchemaException):
-        get_name(df)
+        get_name_wrong(df)
+
+    @validate_dataframes
+    def get_name_right(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
+        return dt.withColumn('name', F.lit('abc'))
+
+    get_name_right(df)
