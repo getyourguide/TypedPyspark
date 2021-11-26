@@ -11,7 +11,7 @@ Allows one to:
 #  Rationale
 
 Projects using spark that follow software engineering best practices is common to see
-functions defined with type annotations this:
+functions defined with type annotations like this:
 
 ```py
 from pyspark.sql import DataFrame
@@ -20,11 +20,15 @@ def get_name_from_id(dt: DataFrame) -> DataFrame:
     ...
 ```
 
-But this type annotation only guarantees that a DataFrame instance is called, it says nothing about the content of the dataframe.
-If the columns needed in the function are actually there we can only know by running the function and see if it breaks.
-If there are much more columns than expected nobody will know. We cannot also say anything about the types of the columns.
+But this type annotation only guarantees that a DataFrame instance is called.
+It says nothing about important information about the dataframe.
 
-This library tries to address exactly these problems, with it you can do something like the following:
+1. If the columns needed are there
+2. If they have the correct types
+3. If there are much more data than needed
+
+This library tries to address exactly these problems.
+With it you can do something like the following:
 
 # Usage
 
@@ -36,12 +40,13 @@ def get_name_from_id(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
     ...
 ```
 
-And get type errors when the annotations dont match reality.
+By running it you get type errors when the annotations dont match reality.
+You also get self-documenting code in form of expressive annotations.
 
 # Install
 
 ```sh
-pip install typed_pyspark
+pip install typed-pyspark
 ```
 
 
