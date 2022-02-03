@@ -30,27 +30,14 @@ It says nothing about how the dataframe looks like.
 3. If there are much more data than needed
 
 This library tries to address exactly these problems.
-With it you can do something like the following:
-
-# Usage
-
-```py
-from typed_pyspark import DataFrame, validate_dataframes
-
-@validate_dataframes
-def get_name_from_id(dt: DataFrame["id"]) -> DataFrame["id", "name"]:
-    ...
-```
-
 By running it you get type errors when the annotations dont match reality.
 You also get self-documenting code in form of expressive annotations.
 
 # Install
 
 ```sh
-pip install typed-pyspark
+pip install 'typed-pyspark~=0.0.3'
 ```
-
 
 ## Acknowledgements
 
