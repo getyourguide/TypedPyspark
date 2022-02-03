@@ -1,103 +1,75 @@
 from __future__ import annotations
 
-from typing import List, TypeVar, Union
+import datetime
+from typing import List, Optional, TypeVar
 
 from pyspark.sql import DataFrame as DataFrameOrig
+from pyspark.sql import SparkSession
 
 
-def wrap_with_generic(x):
-    return TypeVar("DataFrame", x, DataFrameOrig)
+def create_datetime(x, format="%Y-%m-%dT%H:%M:%SZ"):
+    return datetime.datetime.strptime(x, format)
 
 
-class DataFrame(DataFrameOrig):
-    """
-    TypedDataFrame abstraction
-    """
+def assert_expected_like_result(expected_df, result_df):
+    assert_dfs_are_equal(expected_df, result_df.select(expected_df.columns))
 
-    def __class_getitem__(cls, *args, **kwargs):
-        # 'inherits a new type from dataframe base type'
-        df_class = type("TypedDataFrame", (DataFrame, DataFrameOrig), {})
 
-        df_class.schema = {}
-        df_class.schema["args"] = args
-        df_class.schema["kwargs"] = kwargs
+def assert_identical_content(df1, df2):
+    if df1.collect() != df2.collect():
+        df1.show()
+        df2.show()
+        raise Exception("Dataframes differ in the content")
+    return True
 
-        #return wrap_with_generic(df_class)
-        return df_class
 
-    def __init__(self, *args, **kwargs):
-        pass
+def assert_dfs_are_equal(df1, df2) -> bool:
+    if df1.schema != df2.schema:
+        df1.printSchema()
+        df2.printSchema()
+        raise Exception("Dataframes differ in the schema")
+
+    assert_identical_content(df1, df2)
+
+    return True
+
+
+class Dataframe:
+    default_values: dict = {}
+    schema: dict = {}
+
+    def create_df(
+        self, data: List[dict], schema=None, default_values: Optional[dict] = None
+    ):
+
+        entries = []
+        default_values = (
+            {**default_values, **self.default_values}
+            if default_values
+            else self.default_values
+        )
+
+        # merge rows with default values
+        for row in data:
+            row = {**default_values, **row}
+            entries.append(row)
+
+        schema = schema if schema else self.schema
+
+        spark = SparkSession.builder.getOrCreate()
+        df = spark.createDataFrame(entries, schema=self.schema_to_str(schema))
+        return df
+
+    def __init__(self, schema, default_values=default_values):
+        self.schema = schema
+        self.default_values = default_values
+
+    @staticmethod
+    def schema_to_str(a_dict):
+        result = "".join(key + " " + value + "," for key, value in a_dict.items())
+        result = result[:-1]
+        return result
 
     @classmethod
-    def from_data(cls, data: List[dict]) -> List["DataFrame"]:
-        result = []
-        for row in data:
-            rowobj = cls(**row)
-            result.append(rowobj)
-
-        return result
-
-
-class InvalidSchemaException(Exception):
-    pass
-
-
-def validate_dataframes(func):
-    """ validate all dataframes available in a function"""
-
-    def wrap(*args, **kwargs):
-        Validator.validate_args(func, args, kwargs)
-        result = func(*args, **kwargs)
-        Validator.validate_result(func, result)
-        return result
-
-    return wrap
-
-
-class Validator:
-    @staticmethod
-    def validate_args(func, args, kwargs):
-
-        expected_dataframe_arguments = [
-            x
-            for x in func.__annotations__
-            if x != "return" and DataFrame in func.__annotations__[x].__bases__
-        ]
-
-        if not len(expected_dataframe_arguments):
-            return
-
-        args_to_be_validated = [arg for arg in args if isinstance(arg, DataFrameOrig)]
-
-        if len(expected_dataframe_arguments) != len(args_to_be_validated):
-            raise InvalidSchemaException(
-                f"Expected : {len(expected_dataframe_arguments)} dataframes got only {len(args_to_be_validated)}"
-            )
-
-        for i in range(0, len(args_to_be_validated)):
-            columns_got = set(args_to_be_validated[i].columns)
-            columns_expected = set(
-                func.__annotations__[expected_dataframe_arguments[i]].schema["args"]
-            )
-
-            if columns_expected != columns_got:
-                raise InvalidSchemaException(
-                    f"Return Schema different, got: {columns_got}, expected: {columns_expected}"
-                )
-
-    @staticmethod
-    def validate_result(func, result):
-        if (
-            "return" not in func.__annotations__
-            or not hasattr(func.__annotations__["return"], "__bases__")
-            or DataFrame not in func.__annotations__["return"].__bases__
-        ):
-            return
-
-        columns_expected = set(func.__annotations__["return"].schema["args"][0])
-        columns_got = set(result.columns)
-
-        if columns_expected != columns_got:
-            raise InvalidSchemaException(
-                f"Return Schema different, got: {columns_got}, expected: {columns_expected}"
-            )
+    def type_annotation(cls):
+        return TypeVar("DataFrame", cls, DataFrameOrig)
