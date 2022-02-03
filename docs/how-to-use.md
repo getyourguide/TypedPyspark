@@ -1,6 +1,4 @@
-
-
-## How to use it
+# How to use it
 
 ```py
 
@@ -26,8 +24,7 @@ reviewTable = Dataframe(
 
 ReviewTableType = ReviewTable.type_annotation()
 
-Daily_Reviews = Dataframe(
-    schema={
+Daily_Reviews = Dataframe( schema={
         "date": "Date",
         "tour_id": "Integer",
         "num_reviews": "Integer",
