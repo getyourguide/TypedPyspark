@@ -26,18 +26,6 @@ reviewTable = Dataframe(
 
 ReviewTableType = ReviewTable.type_annotation()
 
-RawReviews = Dataframe(
-    schema={
-        "date_of_review": "Date",
-        "review_id": "Integer",
-        "tour_id": "Integer",
-        "rating": "Double",
-    },
-    default_values={"rating": 2.4},
-)
-
-RawReviewsType = RawReviews.type_annotation()
-
 Daily_Reviews = Dataframe(
     schema={
         "date": "Date",
