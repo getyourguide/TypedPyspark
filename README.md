@@ -5,7 +5,7 @@ Contains a set of abstractions to type dataframes in pyspark.
 Allows one to:
 
 - Define dataframe schemas and use them as annotations in variables, functions, classes
-- Create mock data easily based on these schemas
+- Create mock data for tests easily based on these schemas
 
 #  Rationale
 
