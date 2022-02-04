@@ -5,10 +5,7 @@ Contains a set of abstractions to type dataframes in pyspark.
 Allows one to:
 
 - Define dataframe schemas and use them as annotations in variables, functions, classes
-- Validate them in realtime with the @validate_dataframes functionality
-
-It still does not validate statically but it does not break your mypy.
-
+- Create mock data easily based on these schemas
 
 #  Rationale
 
