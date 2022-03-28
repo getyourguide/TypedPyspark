@@ -8,7 +8,7 @@ import setuptools
 
 setuptools.setup(
     name="typed_pyspark",
-    version="0.0.3",
+    version="0.0.4",
     author="Jean Carlo Machado",
     author_email="engineering.data-products@getyourguide.com",
     description="Contains a set of abstractions to type annotate and validate dataframes in pyspark",

@@ -33,7 +33,7 @@ You also get self-documenting code in form of expressive annotations.
 # Install
 
 ```sh
-pip install 'typed-pyspark~=0.0.3'
+pip install 'typed-pyspark~=0.0.4'
 ```
 
 ## Acknowledgements
