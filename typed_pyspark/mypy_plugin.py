@@ -7,11 +7,9 @@ from mypy.plugin import Plugin
 
 class CustomPlugin(Plugin):
     def main(self, func):
-        return func.api.fail("test jean")
-        # return func.default_return_type
+        return func.api.fail("Typed-Pyspark failed to load as plugin")
 
     def get_function_hook(self, name):
-        # print("F:" + name)
         if name == "DF":
             return self.main
         else:

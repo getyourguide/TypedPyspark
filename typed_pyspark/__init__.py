@@ -64,6 +64,13 @@ class Dataframe:
         self.schema = schema
         self.default_values = default_values
 
+    def columns(self):
+        """
+        IDE Auto-complete suggests that we can call this method, but it needs to be implemented here.
+        Returns a list of all column names.
+        """
+        return list(self.schema.keys())
+
     @staticmethod
     def schema_to_str(a_dict):
         result = "".join(key + " " + value + "," for key, value in a_dict.items())
