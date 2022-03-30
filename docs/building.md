@@ -5,6 +5,8 @@ For details see the official [packing instructions](https://packaging.python.org
 
 If you don't own the project reach us instead.
 
-```
+If you are authenticated then just run:
+
+```sh 
 python cli.py build_and_release
 ```
