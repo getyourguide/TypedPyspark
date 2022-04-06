@@ -64,7 +64,8 @@ class Dataframe:
         self.schema = schema
         self.default_values = default_values
 
-    def columns(self):
+    @property
+    def columns(self) -> List[str]:
         """
         IDE Auto-complete suggests that we can call this method, but it needs to be implemented here.
         Returns a list of all column names.
